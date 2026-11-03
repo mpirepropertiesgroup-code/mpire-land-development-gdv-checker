@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111318">
+<title>MPIRE | Land Development GDV & Feasibility Checker</title>
+<style>
+:root{--bg:#0c0e12;--panel:#151920;--panel2:#1b2029;--line:#2b323e;--text:#f3f5f7;--muted:#a3adba;--red:#e33b43;--orange:#f29a38;--green:#36b37e;--blue:#69a9ff;--shadow:0 12px 35px #0005}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#0a0c10,#121720 55%,#0c0e12);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+header{padding:22px clamp(16px,4vw,48px);border-bottom:1px solid var(--line);background:#101319eF;position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:46px;height:46px;border:2px solid var(--red);border-radius:12px;display:grid;place-items:center;font-weight:900;letter-spacing:-2px;color:white;font-size:17px;box-shadow:inset 0 0 0 3px #ffffff0b}.brand h1{font-size:17px;line-height:1.2;margin:0;letter-spacing:.08em}.brand small{color:var(--muted);letter-spacing:.16em;font-size:10px}.topline{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 14px;border-radius:9px;cursor:pointer;font-weight:650;font-size:12px}
+button:hover,.btn:hover{border-color:var(--red)}button.primary{background:var(--red);border-color:var(--red);color:white}button.ghost{background:transparent}
+.wrap{max-width:1500px;margin:auto;padding:26px clamp(14px,3vw,38px) 60px}
+.hero{display:flex;justify-content:space-between;gap:24px;align-items:end;margin:8px 0 22px;flex-wrap:wrap}.eyebrow{color:var(--orange);font-size:10px;letter-spacing:.2em;font-weight:800}.hero h2{font-size:clamp(25px,3vw,38px);line-height:1.1;margin:7px 0}.hero p{margin:0;color:var(--muted);max-width:750px}
+.pill{display:inline-flex;border:1px solid #3b4655;color:#cbd5e1;border-radius:99px;padding:5px 10px;font-size:10px;letter-spacing:.08em}
+.notice{border:1px solid #6b4b24;background:#2a2117;color:#f5d8ad;padding:12px 15px;border-radius:10px;margin:18px 0;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:linear-gradient(160deg,#191e27,#13171e);border:1px solid var(--line);border-radius:13px;padding:17px;box-shadow:var(--shadow);min-width:0}.card h3{font-size:13px;margin:0 0 14px;letter-spacing:.04em}.card h3 span{color:var(--red);margin-right:7px}.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}.span-3{grid-column:span 3}
+.fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.fields.two{grid-template-columns:repeat(2,minmax(0,1fr))}.field{min-width:0}.field label{display:block;color:var(--muted);font-size:11px;margin:0 0 5px}.field input,.field select,.field textarea{width:100%;background:#0e1218;border:1px solid #343d4b;color:var(--text);border-radius:8px;padding:10px 11px;font:inherit;outline:none;min-width:0}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);box-shadow:0 0 0 2px #f29a3820}.field small{display:block;color:#778392;font-size:10px;margin-top:4px}.field textarea{min-height:68px;resize:vertical}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{background:#0f141b;border:1px solid var(--line);border-radius:11px;padding:14px}.kpi .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}.kpi .value{font-size:clamp(18px,2vw,25px);font-weight:800;margin-top:5px;overflow-wrap:anywhere}.kpi .sub{font-size:10px;color:#8793a1;margin-top:4px}
+.status{font-size:11px;font-weight:800;letter-spacing:.08em;border-radius:6px;padding:5px 8px;display:inline-block}.status.good{background:#123528;color:#71e0ad}.status.warn{background:#392b17;color:#ffc36d}.status.bad{background:#3a1c21;color:#ff8991}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}th{color:var(--muted);font-weight:650;background:#ffffff05}td{font-variant-numeric:tabular-nums}.total td{font-weight:800;color:#fff;border-top:1px solid #596372}
+.bar{height:9px;background:#252d38;border-radius:99px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--orange));width:0}
+.chart{display:flex;align-items:end;gap:14px;height:170px;padding:12px 8px 0;border-bottom:1px solid var(--line)}.barcol{flex:1;min-width:35px;text-align:center;height:100%;display:flex;flex-direction:column;justify-content:end;gap:7px}.barcol i{display:block;min-height:2px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--orange),var(--red))}.barcol b{font-size:10px;color:var(--muted);font-weight:600}.barcol small{font-size:10px;color:#dce2e9}
+.muted{color:var(--muted)}.small{font-size:11px}.right{text-align:right}.row{display:flex;justify-content:space-between;gap:12px;align-items:center}.divider{height:1px;background:var(--line);margin:14px 0}.checks{display:flex;gap:12px;flex-wrap:wrap}.checks label{font-size:11px;color:var(--muted)}.checks input{accent-color:var(--red)}
+footer{margin-top:26px;padding:18px 4px;border-top:1px solid var(--line);color:#788391;font-size:10px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media(max-width:900px){.span-8,.span-7,.span-6,.span-5,.span-4,.span-3{grid-column:span 12}.fields{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){header{position:static}.fields,.fields.two{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{align-items:start}.header-actions button{flex:1}}
+@media print{body{background:#fff;color:#111;font-size:10px}header{position:static;background:#fff;color:#111;border-color:#bbb;padding:10px 0}.wrap{padding:10px;max-width:none}.card,.kpi{background:#fff;color:#111;box-shadow:none;border:1px solid #bbb;break-inside:avoid}.muted,.field label,.kpi .label,.kpi .sub,footer{color:#555}.field input,.field select,.field textarea{background:#fff;color:#111;border:1px solid #aaa;padding:5px}.notice{background:#fff8e8;color:#513b18;border-color:#c9a66b}.hero h2{font-size:22px}.grid{gap:8px}.card{padding:10px}button,.header-actions{display:none!important}th,td{border-color:#ddd;color:#111}.bar{background:#ddd}.status{border:1px solid #777;background:#fff!important;color:#111!important}.no-print{display:none!important}}
+</style>
+</head>
+<body>
+<header><div class="topline">
+ <div class="brand"><div class="logo">MP</div><div><h1>MPIRE PROPERTIES</h1><small>LAND DEVELOPMENT ANALYZER · MALAYSIA EDITION</small></div></div>
+ <div class="header-actions"><button class="ghost" onclick="resetForm()">Reset</button><button onclick="window.print()" class="primary">Export / Save PDF</button></div>
+</div></header>
+<main class="wrap">
+ <section class="hero"><div><div class="eyebrow">DEVELOPMENT APPRAISAL · DECISION SUPPORT</div><h2>Land Development GDV<br>& Feasibility Checker</h2><p>Preliminary financial modelling for residential, commercial, industrial and mixed-use land development in Malaysia.</p></div><span class="pill">FULL FEASIBILITY WORKSPACE</span></section>
+ <div class="notice"><b>Important — preliminary appraisal only.</b> This tool does not retrieve or verify land title, zoning, planning permission, market comparables, construction quotations, statutory contributions or financing terms. Enter evidence-backed inputs. Blank or zero values are not market facts. Confirm planning parameters with the relevant Local Authority (PBT), land office and qualified consultants before making an acquisition or investment decision.</div>
+
+ <section class="grid">
+  <div class="card span-12"><h3><span>01</span> Project & Land Information</h3>
+   <div class="fields">
+    <div class="field"><label>Project / Site Name</label><input id="project" placeholder="e.g. Proposed township development"></div>
+    <div class="field"><label>State</label><select id="state"><option value="">Select state</option><option>Johor</option><option>Kedah</option><option>Kelantan</option><option>Melaka</option><option>Negeri Sembilan</option><option>Pahang</option><option>Penang</option><option>Perak</option><option>Perlis</option><option>Sabah</option><option>Sarawak</option><option>Selangor</option><option>Terengganu</option><option>W.P. Kuala Lumpur</option><option>W.P. Putrajaya</option><option>W.P. Labuan</option></select></div>
+    <div class="field"><label>District / Locality</label><input id="locality" placeholder="Town / mukim / district"></div>
+    <div class="field"><label>Land Area (acres)</label><input id="acres" type="number" min="0" step="0.01" placeholder="Enter verified area"></div>
+    <div class="field"><label>Land Area (sq ft) — calculated</label><input id="landSqft" readonly placeholder="Auto-calculated"></div>
+    <div class="field"><label>Tenure</label><select id="tenure"><option value="">Select</option><option>Freehold</option><option>Leasehold</option><option>Malay Reserve</option><option>Other / To verify</option></select></div>
+    <div class="field"><label>Land Category</label><select id="category"><option value="">Select / verify title</option><option>Building</option><option>Agriculture</option><option>Industry</option><option>Other / To verify</option></select></div>
+    <div class="field"><label>Existing Express Condition / Restriction</label><input id="restriction" placeholder="As stated on title / verify"></div>
+    <div class="field"><label>Current Land Asking / Acquisition Price (RM)</label><input id="landCost" type="number" min="0" step="1000" placeholder="Enter asking / agreed price"></div>
+    <div class="field"><label>Source / Evidence Reference</label><input id="landSource" placeholder="Title, owner, valuer, date, document ref"></div>
+   </div>
+  </div>
+
+  <div class="card span-12"><h3><span>02</span> Planning & Developable Land Assumptions</h3>
+   <div class="fields">
+    <div class="field"><label>Proposed Development Type</label><select id="devType"><option value="">Select concept</option><option>Residential — landed</option><option>Residential — high-rise</option><option>Commercial</option><option>Industrial</option><option>Mixed development</option><option>Other</option></select></div>
+    <div class="field"><label>Planning / Zoning Status</label><select id="zoning"><option value="">Not verified</option><option>Verified — compatible</option><option>Pending confirmation</option><option>Not compatible / conversion required</option></select></div>
+    <div class="field"><label>Net Developable Area (%)</label><input id="developable" type="number" min="0" max="100" step="0.1" placeholder="Enter from concept / planner"></div>
+    <div class="field"><label>Gross Plot Ratio (if applicable)</label><input id="plotRatio" type="number" min="0" step="0.1" placeholder="Optional; verify PBT"></div>
+    <div class="field"><label>Density (units / acre, if applicable)</label><input id="density" type="number" min="0" step="0.1" placeholder="Optional; verify PBT"></div>
+    <div class="field"><label>Planning Reference / Source</label><input id="planningSource" placeholder="Local Plan, zoning map, planner, date"></div>
+   </div>
+   <p class="small muted">Net developable area should reflect verified planning layout and exclusions such as roads, open space, reserves, drainage and utilities. Do not assume a universal percentage or density.</p>
+  </div>
+
+  <div class="card span-12"><h3><span>03</span> Development Yield & Sales Assumptions</h3>
+   <div class="fields">
+    <div class="field"><label>Saleable / Net Floor Area (sq ft)</label><input id="saleableArea" type="number" min="0" step="1" placeholder="Optional; use where relevant"></div>
+    <div class="field"><label>Total Saleable Units / Lots</label><input id="units" type="number" min="0" step="1" placeholder="Enter proposed yield"></div>
+    <div class="field"><label>Average Selling Price per Unit (RM)</label><input id="priceUnit" type="number" min="0" step="1000" placeholder="Evidence-backed estimate"></div>
+    <div class="field"><label>Average Selling Price (RM / sq ft)</label><input id="priceSqft" type="number" min="0" step="1" placeholder="For area-based model"></div>
+    <div class="field"><label>Revenue Method</label><select id="revenueMethod"><option value="unit">Units × average selling price</option><option value="area">Saleable area × price per sq ft</option></select></div>
+    <div class="field"><label>Sales Evidence / Comparable Reference</label><input id="salesSource" placeholder="Comparable, date, source, adjustment notes"></div>
+   </div>
+   <p class="small muted">Choose one revenue method. Do not double count unit revenue and floor-area revenue. For mixed-use projects, model each component separately or use a weighted blended assumption with supporting schedules.</p>
+  </div>
+
+  <div class="card span-7"><h3><span>04</span> Development Cost Assumptions (RM)</h3>
+   <div class="fields two">
+    <div class="field"><label>Construction Cost</label><input id="construction" type="number" min="0" step="1000" placeholder="Enter QS / benchmark estimate"></div>
+    <div class="field"><label>Infrastructure & External Works</label><input id="infrastructure" type="number" min="0" step="1000" placeholder="Road, drainage, utilities etc."></div>
+    <div class="field"><label>Professional / Consultant Fees</label><input id="professional" type="number" min="0" step="1000" placeholder="Architect, engineer, planner, QS etc."></div>
+    <div class="field"><label>Statutory / Authority Contributions</label><input id="statutory" type="number" min="0" step="1000" placeholder="PBT / utility / other confirmed charges"></div>
+    <div class="field"><label>Land Conversion / Premium / Legal</label><input id="conversion" type="number" min="0" step="1000" placeholder="If applicable; verify with authority"></div>
+    <div class="field"><label>Marketing & Sales</label><input id="marketing" type="number" min="0" step="1000" placeholder="Agency, campaign, sales costs"></div>
+    <div class="field"><label>Finance / Interest / Fees</label><input id="finance" type="number" min="0" step="1000" placeholder="Finance model / lender terms"></div>
+    <div class="field"><label>Other / Contingency (RM)</label><input id="otherCost" type="number" min="0" step="1000" placeholder="Enter allowance"></div>
+   </div>
+  </div>
+  <div class="card span-5"><h3><span>05</span> Profit & Residual Land Value Settings</h3>
+   <div class="fields two">
+    <div class="field"><label>Target Developer Profit (%)</label><input id="targetProfit" type="number" min="0" max="100" step="0.1" placeholder="Enter required margin"></div>
+    <div class="field"><label>Profit Basis</label><select id="profitBasis"><option value="gdv">Percentage of GDV</option><option value="cost">Percentage of non-land cost</option></select></div>
+    <div class="field"><label>Additional Risk Allowance (%)</label><input id="risk" type="number" min="0" max="100" step="0.1" placeholder="Optional; default 0"></div>
+    <div class="field"><label>Appraisal Notes</label><input id="notes" placeholder="Key risks / exclusions"></div>
+   </div>
+   <div class="divider"></div><div class="small muted">Residual Land Value (RLV) = GDV − non-land development costs − required developer profit. This is a simplified residual appraisal, not a formal valuation or offer price.</div>
+  </div>
+
+  <div class="card span-12"><div class="row"><h3><span>06</span> Live Feasibility Dashboard</h3><span id="status" class="status warn">AWAITING INPUTS</span></div>
+   <div class="kpis">
+    <div class="kpi"><div class="label">Gross Development Value</div><div class="value" id="kpiGdv">RM 0</div><div class="sub">Based on selected revenue method</div></div>
+    <div class="kpi"><div class="label">Total Development Cost*</div><div class="value" id="kpiGdc">RM 0</div><div class="sub">Includes entered land cost</div></div>
+    <div class="kpi"><div class="label">Development Profit*</div><div class="value" id="kpiProfit">RM 0</div><div class="sub">GDV less entered total cost</div></div>
+    <div class="kpi"><div class="label">Profit Margin*</div><div class="value" id="kpiMargin">—</div><div class="sub">Profit ÷ GDV</div></div>
+    <div class="kpi"><div class="label">Residual Land Value</div><div class="value" id="kpiRlv">RM 0</div><div class="sub">Before negotiation / adjustments</div></div>
+    <div class="kpi"><div class="label">Land Asking Price</div><div class="value" id="kpiAsk">RM 0</div><div class="sub">User-entered price</div></div>
+    <div class="kpi"><div class="label">RLV less Asking Price</div><div class="value" id="kpiGap">RM 0</div><div class="sub">Positive = within simplified RLV</div></div>
+    <div class="kpi"><div class="label">Land Area / Net Developable</div><div class="value" id="kpiArea">—</div><div class="sub">Acres / acres</div></div>
+   </div>
+   <div class="divider"></div>
+   <div class="grid">
+    <div class="span-6"><div class="row"><b class="small">GDV vs Total Development Cost</b><span id="gdvCostLabel" class="small muted">No data</span></div><div class="chart" id="mainChart"><div class="muted small">Enter project assumptions to view comparison.</div></div></div>
+    <div class="span-6"><b class="small">Cost Breakdown</b><div id="costBreakdown" class="small muted" style="margin-top:12px">Enter cost assumptions to display breakdown.</div></div>
+   </div>
+  </div>
+
+  <div class="card span-6"><h3><span>07</span> Feasibility Calculation Summary</h3>
+   <table><tbody>
+    <tr><td>Gross Development Value (GDV)</td><td id="tGdv">RM 0</td></tr>
+    <tr><td>Non-land development costs</td><td id="tNonLand">RM 0</td></tr>
+    <tr><td>Land acquisition / asking price</td><td id="tLand">RM 0</td></tr>
+    <tr><td>Total Development Cost (GDC)</td><td id="tGdc">RM 0</td></tr>
+    <tr><td>Development Profit / (Loss)</td><td id="tProfit">RM 0</td></tr>
+    <tr><td>Developer target profit</td><td id="tTarget">RM 0</td></tr>
+    <tr><td>Residual Land Value (simplified)</td><td id="tRlv">RM 0</td></tr>
+    <tr><td>RLV less asking price</td><td id="tGap">RM 0</td></tr>
+   </tbody></table>
+   <p class="small muted">* Dashboard profit is calculated after the entered land price. RLV is calculated separately by deducting the target developer profit and non-land costs from GDV.</p>
+  </div>
+  <div class="card span-6"><h3><span>08</span> Input Completeness & Due Diligence</h3>
+   <div id="completeness" class="small muted">Complete the key inputs to generate an appraisal status.</div>
+   <div class="divider"></div>
+   <div class="checks">
+    <label><input type="checkbox" class="verify"> Title search verified</label>
+    <label><input type="checkbox" class="verify"> Zoning / Local Plan verified</label>
+    <label><input type="checkbox" class="verify"> Planning parameters confirmed</label>
+    <label><input type="checkbox" class="verify"> Comparable evidence checked</label>
+    <label><input type="checkbox" class="verify"> QS / consultant cost plan obtained</label>
+    <label><input type="checkbox" class="verify"> Statutory charges confirmed</label>
+    <label><input type="checkbox" class="verify"> Access / utilities / constraints checked</label>
+    <label><input type="checkbox" class="verify"> Finance assumptions confirmed</label>
+   </div>
+   <p class="small muted">Tick only after the relevant evidence has actually been reviewed.</p>
+  </div>
+
+  <div class="card span-12"><h3><span>09</span> Sensitivity Analysis</h3>
+   <p class="small muted">Illustrative scenario analysis around your entered GDV and non-land cost. This is not a forecast; it shows how selected changes affect residual land value.</p>
+   <div style="overflow-x:auto"><table><thead><tr><th>Scenario</th><th>GDV Change</th><th>Cost Change</th><th>Scenario GDV</th><th>Scenario Non-land Cost</th><th>Scenario RLV</th></tr></thead><tbody id="sensitivityRows"><tr><td colspan="6" class="muted">Enter GDV and costs to calculate scenarios.</td></tr></tbody></table></div>
+  </div>
+  <div class="card span-12"><h3><span>10</span> Sources, Assumptions & Report Notes</h3>
+   <div class="fields two">
+    <div class="field"><label>Market / Comparable Evidence</label><textarea id="evidenceMarket" placeholder="Record source, date, transaction / asking evidence, adjustments and limitations."></textarea></div>
+    <div class="field"><label>Planning / Technical Evidence</label><textarea id="evidencePlanning" placeholder="Record PBT, Local Plan, planner / consultant, reference number and date."></textarea></div>
+    <div class="field"><label>Cost / Finance Evidence</label><textarea id="evidenceCost" placeholder="Record QS estimates, quotations, finance terms, date and exclusions."></textarea></div>
+    <div class="field"><label>Limitations / Outstanding Items</label><textarea id="evidenceLimit" placeholder="List all unverified inputs, approvals, risks and required follow-up."></textarea></div>
+   </div>
+   <div class="divider"></div>
+   <div class="row"><div class="small muted">Report generated locally in this browser. No project data is sent to a server.</div><button class="primary" onclick="window.print()">Print / Save Feasibility PDF</button></div>
+  </div>
+ </section>
+ <footer><span>MPIRE PROPERTIES · LAND DEVELOPMENT ANALYZER</span><span>Decision-support model only · Malaysia Edition · Verify all inputs independently</span></footer>
+</main>
+<script>
+const ids=['project','state','locality','acres','tenure','category','restriction','landCost','landSource','devType','zoning','developable','plotRatio','density','planningSource','saleableArea','units','priceUnit','priceSqft','revenueMethod','salesSource','construction','infrastructure','professional','statutory','conversion','marketing','finance','otherCost','targetProfit','profitBasis','risk','notes','evidenceMarket','evidencePlanning','evidenceCost','evidenceLimit'];
+const num=id=>{const v=parseFloat(document.getElementById(id).value);return Number.isFinite(v)&&v>0?v:0};
+const val=id=>document.getElementById(id).value.trim();
+const money=n=>'RM '+(Number.isFinite(n)?n:0).toLocaleString('en-MY',{maximumFractionDigits:0});
+const pct=n=>Number.isFinite(n)?n.toFixed(1)+'%':'—';
+const set=(id,v)=>document.getElementById(id).textContent=v;
+function calculate(){
+ const acres=num('acres'), area=acres*43560; document.getElementById('landSqft').value=area?area.toLocaleString('en-MY',{maximumFractionDigits:0}):'';
+ const devPct=Math.min(100,num('developable')), netAcres=acres*devPct/100;
+ const gdv=document.getElementById('revenueMethod').value==='area'?num('saleableArea')*num('priceSqft'):num('units')*num('priceUnit');
+ const land=num('landCost');
+ const costs={Construction:num('construction'),Infrastructure:num('infrastructure'),Professional:num('professional'),Statutory:num('statutory'),Conversion:num('conversion'),Marketing:num('marketing'),Finance:num('finance'),Other:num('otherCost')};
+ const nonLand=Object.values(costs).reduce((a,b)=>a+b,0);
+ const risk= num('risk')/100, riskCost=nonLand*risk, adjustedNonLand=nonLand+riskCost;
+ const gdc=land+adjustedNonLand, profit=gdv-gdc, margin=gdv?profit/gdv*100:0;
+ const targetRate=num('targetProfit')/100;
+ const targetProfit=document.getElementById('profitBasis').value==='cost'?adjustedNonLand*targetRate:gdv*targetRate;
+ const rlv=gdv-adjustedNonLand-targetProfit, gap=rlv-land;
+ set('kpiGdv',money(gdv));set('kpiGdc',money(gdc));set('kpiProfit',money(profit));set('kpiMargin',gdv?pct(margin):'—');
+ set('kpiRlv',money(rlv));set('kpiAsk',money(land));set('kpiGap',money(gap));set('kpiArea',acres?acres.toFixed(2)+' / '+netAcres.toFixed(2):'—');
+ set('tGdv',money(gdv));set('tNonLand',money(adjustedNonLand));set('tLand',money(land));set('tGdc',money(gdc));set('tProfit',money(profit));set('tTarget',money(targetProfit));set('tRlv',money(rlv));set('tGap',money(gap));
+ const status=document.getElementById('status');let label='AWAITING INPUTS',cls='warn';
+ if(gdv>0&&nonLand>0&&num('units')+num('saleableArea')>0){if(profit>0&&gap>=0){label='INDICATIVE POSITIVE';cls='good'}else if(profit>0){label='PROFITABLE — ASKING ABOVE RLV';cls='warn'}else{label='INDICATIVE NOT FEASIBLE';cls='bad'}}
+ status.textContent=label;status.className='status '+cls;
+ set('gdvCostLabel',gdv||gdc?money(gdv)+' / '+money(gdc):'No data');
+ const max=Math.max(gdv,gdc,1), chart=document.getElementById('mainChart');
+ chart.innerHTML=[['GDV',gdv],['Total cost',gdc],['Profit',Math.max(0,profit)]].map(([name,n])=>`<div class="barcol"><small>${money(n)}</small><i style="height:${Math.max(2,n/max*100)}%"></i><b>${name}</b></div>`).join('');
+ const cb=document.getElementById('costBreakdown');
+ cb.innerHTML=Object.entries(costs).filter(x=>x[1]>0).map(([name,n])=>`<div style="margin:8px 0"><div class="row"><span>${name}</span><b>${money(n)}</b></div><div class="bar"><i style="width:${nonLand?n/nonLand*100:0}%"></i></div></div>`).join('')+(riskCost?`<div class="row"><span>Risk allowance</span><b>${money(riskCost)}</b></div>`:'')||'No development cost assumptions entered.';
+ const completeness=[];
+ if(!val('project'))completeness.push('Project name');if(!acres)completeness.push('Land area');if(!land)completeness.push('Land price');if(!val('zoning')||val('zoning')==='')completeness.push('Planning status');if(!devPct)completeness.push('Net developable area');if(!gdv)completeness.push('GDV inputs');if(!nonLand)completeness.push('Development cost plan');if(!val('salesSource'))completeness.push('Sales evidence reference');if(!val('planningSource'))completeness.push('Planning evidence reference');
+ const verified=document.querySelectorAll('.verify:checked').length;
+ document.getElementById('completeness').innerHTML=`<b>${9-completeness.length}/9 key data groups populated</b> · ${verified}/8 due-diligence checks marked complete.`+(completeness.length?`<p>Outstanding: ${completeness.join(', ')}.</p>`:'<p>Key fields populated. Verify evidence and assumptions before relying on the result.</p>');
+ const scenarios=[[-10,0],[-10,10],[0,0],[0,10],[10,0],[10,10]];
+ document.getElementById('sensitivityRows').innerHTML=scenarios.map(([g,c])=>{const sg=gdv*(1+g/100),sc=adjustedNonLand*(1+c/100),sp=document.getElementById('profitBasis').value==='cost'?sc*targetRate:sg*targetRate,sr=sg-sc-sp;return `<tr><td>${g===0&&c===0?'Base case':`GDV ${g>0?'+':''}${g}% / Cost +${c}%`}</td><td>${g}%</td><td>+${c}%</td><td>${money(sg)}</td><td>${money(sc)}</td><td>${money(sr)}</td></tr>`}).join('');
+}
+function resetForm(){if(!confirm('Clear all project inputs and verification ticks?'))return;ids.forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});document.querySelectorAll('.verify').forEach(e=>e.checked=false);calculate()}
+ids.forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',calculate);if(e)e.addEventListener('change',calculate)});
+document.querySelectorAll('.verify').forEach(e=>e.addEventListener('change',calculate));
+calculate();
+</script>
+</body>
+</html>
